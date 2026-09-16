@@ -16,6 +16,12 @@ import { Route as MarketRouteImport } from './routes/market'
 import { Route as PlansRouteImport } from './routes/plans'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedInvestRouteImport } from './routes/_authenticated.invest'
+import { Route as AuthenticatedMarketsRouteImport } from './routes/_authenticated.markets'
+import { Route as AuthenticatedPortfolioRouteImport } from './routes/_authenticated.portfolio'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
+import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated.support'
+import { Route as AuthenticatedTransfersRouteImport } from './routes/_authenticated.transfers'
+import { Route as AuthenticatedWithdrawRouteImport } from './routes/_authenticated.withdraw'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -51,6 +57,36 @@ const AuthenticatedInvestRoute = AuthenticatedInvestRouteImport.update({
   path: '/invest',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedMarketsRoute = AuthenticatedMarketsRouteImport.update({
+  id: '/markets',
+  path: '/markets',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPortfolioRoute = AuthenticatedPortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSupportRoute = AuthenticatedSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTransfersRoute = AuthenticatedTransfersRouteImport.update({
+  id: '/transfers',
+  path: '/transfers',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedWithdrawRoute = AuthenticatedWithdrawRouteImport.update({
+  id: '/withdraw',
+  path: '/withdraw',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -59,6 +95,12 @@ export interface FileRoutesByFullPath {
   '/plans': typeof PlansRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/invest': typeof AuthenticatedInvestRoute
+  '/markets': typeof AuthenticatedMarketsRoute
+  '/portfolio': typeof AuthenticatedPortfolioRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/support': typeof AuthenticatedSupportRoute
+  '/transfers': typeof AuthenticatedTransfersRoute
+  '/withdraw': typeof AuthenticatedWithdrawRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -67,6 +109,12 @@ export interface FileRoutesByTo {
   '/plans': typeof PlansRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/invest': typeof AuthenticatedInvestRoute
+  '/markets': typeof AuthenticatedMarketsRoute
+  '/portfolio': typeof AuthenticatedPortfolioRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/support': typeof AuthenticatedSupportRoute
+  '/transfers': typeof AuthenticatedTransfersRoute
+  '/withdraw': typeof AuthenticatedWithdrawRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,12 +125,42 @@ export interface FileRoutesById {
   '/plans': typeof PlansRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/invest': typeof AuthenticatedInvestRoute
+  '/_authenticated/markets': typeof AuthenticatedMarketsRoute
+  '/_authenticated/portfolio': typeof AuthenticatedPortfolioRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/support': typeof AuthenticatedSupportRoute
+  '/_authenticated/transfers': typeof AuthenticatedTransfersRoute
+  '/_authenticated/withdraw': typeof AuthenticatedWithdrawRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/market' | '/plans' | '/dashboard' | '/invest'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/market'
+    | '/plans'
+    | '/dashboard'
+    | '/invest'
+    | '/markets'
+    | '/portfolio'
+    | '/settings'
+    | '/support'
+    | '/transfers'
+    | '/withdraw'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/market' | '/plans' | '/dashboard' | '/invest'
+  to:
+    | '/'
+    | '/auth'
+    | '/market'
+    | '/plans'
+    | '/dashboard'
+    | '/invest'
+    | '/markets'
+    | '/portfolio'
+    | '/settings'
+    | '/support'
+    | '/transfers'
+    | '/withdraw'
   id:
     | '__root__'
     | '/'
@@ -92,6 +170,12 @@ export interface FileRouteTypes {
     | '/plans'
     | '/_authenticated/dashboard'
     | '/_authenticated/invest'
+    | '/_authenticated/markets'
+    | '/_authenticated/portfolio'
+    | '/_authenticated/settings'
+    | '/_authenticated/support'
+    | '/_authenticated/transfers'
+    | '/_authenticated/withdraw'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -153,17 +237,71 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInvestRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/markets': {
+      id: '/_authenticated/markets'
+      path: '/markets'
+      fullPath: '/markets'
+      preLoaderRoute: typeof AuthenticatedMarketsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/portfolio': {
+      id: '/_authenticated/portfolio'
+      path: '/portfolio'
+      fullPath: '/portfolio'
+      preLoaderRoute: typeof AuthenticatedPortfolioRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/support': {
+      id: '/_authenticated/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof AuthenticatedSupportRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/transfers': {
+      id: '/_authenticated/transfers'
+      path: '/transfers'
+      fullPath: '/transfers'
+      preLoaderRoute: typeof AuthenticatedTransfersRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/withdraw': {
+      id: '/_authenticated/withdraw'
+      path: '/withdraw'
+      fullPath: '/withdraw'
+      preLoaderRoute: typeof AuthenticatedWithdrawRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedInvestRoute: typeof AuthenticatedInvestRoute
+  AuthenticatedMarketsRoute: typeof AuthenticatedMarketsRoute
+  AuthenticatedPortfolioRoute: typeof AuthenticatedPortfolioRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedSupportRoute: typeof AuthenticatedSupportRoute
+  AuthenticatedTransfersRoute: typeof AuthenticatedTransfersRoute
+  AuthenticatedWithdrawRoute: typeof AuthenticatedWithdrawRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedInvestRoute: AuthenticatedInvestRoute,
+  AuthenticatedMarketsRoute: AuthenticatedMarketsRoute,
+  AuthenticatedPortfolioRoute: AuthenticatedPortfolioRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedSupportRoute: AuthenticatedSupportRoute,
+  AuthenticatedTransfersRoute: AuthenticatedTransfersRoute,
+  AuthenticatedWithdrawRoute: AuthenticatedWithdrawRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
