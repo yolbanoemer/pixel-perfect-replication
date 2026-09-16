@@ -333,6 +333,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accrued_roi: {
+        Args: {
+          _amount: number
+          _daily_rate: number
+          _matures: string
+          _started: string
+        }
+        Returns: number
+      }
+      admin_adjust_balance: {
+        Args: { _amount: number; _note: string; _user_id: string }
+        Returns: number
+      }
+      demo_topup: { Args: { _amount: number }; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -341,6 +355,34 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      place_investment: {
+        Args: { _amount: number; _asset?: string; _plan_id: string }
+        Returns: string
+      }
+      request_withdrawal: {
+        Args: { _amount: number; _destination: string; _method: string }
+        Returns: string
+      }
+      resolve_withdrawal: {
+        Args: {
+          _id: string
+          _note?: string
+          _status: Database["public"]["Enums"]["withdrawal_status"]
+        }
+        Returns: undefined
+      }
+      send_transfer: {
+        Args: { _amount: number; _note?: string; _username: string }
+        Returns: number
+      }
+      set_user_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: undefined
+      }
+      settle_matured: { Args: never; Returns: number }
     }
     Enums: {
       app_role: "admin" | "support" | "investor"
