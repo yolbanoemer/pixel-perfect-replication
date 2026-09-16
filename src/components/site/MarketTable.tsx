@@ -2,15 +2,18 @@ import type { MarketCoin } from "@/lib/queries";
 import { usd, pct } from "@/lib/format";
 
 function Spark({ prices }: { prices: number[] }) {
-  if (!prices?.length) return null;
-  const slice = prices.filter((_, i) => i % 6 === 0);
+  const slice = (prices ?? []).filter((_, i) => i % 6 === 0);
+  if (slice.length < 2) return null;
+  const first = slice[0]!;
+  const last = slice[slice.length - 1]!;
   const min = Math.min(...slice);
   const max = Math.max(...slice);
   const range = max - min || 1;
   const points = slice
     .map((p, i) => `${(i / (slice.length - 1)) * 100},${28 - ((p - min) / range) * 26}`)
     .join(" ");
-  const up = slice[slice.length - 1] >= slice[0];
+  const up = last >= first;
+
   return (
     <svg viewBox="0 0 100 28" className="h-7 w-24" preserveAspectRatio="none">
       <polyline
