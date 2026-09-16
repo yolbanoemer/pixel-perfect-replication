@@ -18,6 +18,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedInvestRouteImport } from './routes/_authenticated.invest'
 import { Route as AuthenticatedMarketsRouteImport } from './routes/_authenticated.markets'
 import { Route as AuthenticatedPortfolioRouteImport } from './routes/_authenticated.portfolio'
+import { Route as AuthenticatedRbacRouteImport } from './routes/_authenticated.rbac'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated.support'
 import { Route as AuthenticatedTransfersRouteImport } from './routes/_authenticated.transfers'
@@ -67,6 +68,11 @@ const AuthenticatedPortfolioRoute = AuthenticatedPortfolioRouteImport.update({
   path: '/portfolio',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedRbacRoute = AuthenticatedRbacRouteImport.update({
+  id: '/rbac',
+  path: '/rbac',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -97,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/invest': typeof AuthenticatedInvestRoute
   '/markets': typeof AuthenticatedMarketsRoute
   '/portfolio': typeof AuthenticatedPortfolioRoute
+  '/rbac': typeof AuthenticatedRbacRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/support': typeof AuthenticatedSupportRoute
   '/transfers': typeof AuthenticatedTransfersRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/invest': typeof AuthenticatedInvestRoute
   '/markets': typeof AuthenticatedMarketsRoute
   '/portfolio': typeof AuthenticatedPortfolioRoute
+  '/rbac': typeof AuthenticatedRbacRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/support': typeof AuthenticatedSupportRoute
   '/transfers': typeof AuthenticatedTransfersRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/_authenticated/invest': typeof AuthenticatedInvestRoute
   '/_authenticated/markets': typeof AuthenticatedMarketsRoute
   '/_authenticated/portfolio': typeof AuthenticatedPortfolioRoute
+  '/_authenticated/rbac': typeof AuthenticatedRbacRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/support': typeof AuthenticatedSupportRoute
   '/_authenticated/transfers': typeof AuthenticatedTransfersRoute
@@ -143,6 +152,7 @@ export interface FileRouteTypes {
     | '/invest'
     | '/markets'
     | '/portfolio'
+    | '/rbac'
     | '/settings'
     | '/support'
     | '/transfers'
@@ -157,6 +167,7 @@ export interface FileRouteTypes {
     | '/invest'
     | '/markets'
     | '/portfolio'
+    | '/rbac'
     | '/settings'
     | '/support'
     | '/transfers'
@@ -172,6 +183,7 @@ export interface FileRouteTypes {
     | '/_authenticated/invest'
     | '/_authenticated/markets'
     | '/_authenticated/portfolio'
+    | '/_authenticated/rbac'
     | '/_authenticated/settings'
     | '/_authenticated/support'
     | '/_authenticated/transfers'
@@ -251,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortfolioRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/rbac': {
+      id: '/_authenticated/rbac'
+      path: '/rbac'
+      fullPath: '/rbac'
+      preLoaderRoute: typeof AuthenticatedRbacRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -287,6 +306,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedInvestRoute: typeof AuthenticatedInvestRoute
   AuthenticatedMarketsRoute: typeof AuthenticatedMarketsRoute
   AuthenticatedPortfolioRoute: typeof AuthenticatedPortfolioRoute
+  AuthenticatedRbacRoute: typeof AuthenticatedRbacRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSupportRoute: typeof AuthenticatedSupportRoute
   AuthenticatedTransfersRoute: typeof AuthenticatedTransfersRoute
@@ -298,6 +318,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedInvestRoute: AuthenticatedInvestRoute,
   AuthenticatedMarketsRoute: AuthenticatedMarketsRoute,
   AuthenticatedPortfolioRoute: AuthenticatedPortfolioRoute,
+  AuthenticatedRbacRoute: AuthenticatedRbacRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSupportRoute: AuthenticatedSupportRoute,
   AuthenticatedTransfersRoute: AuthenticatedTransfersRoute,
