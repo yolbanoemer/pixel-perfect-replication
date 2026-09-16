@@ -51,13 +51,16 @@ function Dashboard() {
   const totalLocked = active.reduce((s, i) => s + num(i.amount_usd), 0);
   const liveRoi = active.reduce((s, i) => s + accruedRoi(i, tick), 0);
   const dailyRate = active.reduce((s, i) => s + num(i.amount_usd) * (num(i.daily_rate) / 100), 0);
-  const paymentsLive = Boolean((settings?.payments as { live?: boolean } | undefined)?.live);
+  const paymentsLive = Boolean((settings?.['payments'] as { live?: boolean } | undefined)?.['live']);
 
   async function topUp() {
     setBusy(true);
     const { error } = await supabase.rpc("demo_topup", { _amount: topupAmount });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success(`${usd(topupAmount)} added to your practice wallet`);
     qc.invalidateQueries();
   }
@@ -66,7 +69,10 @@ function Dashboard() {
     setBusy(true);
     const { data, error } = await supabase.rpc("settle_matured");
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success(`${usd(data as number)} credited to your wallet`);
     qc.invalidateQueries();
   }

@@ -42,13 +42,19 @@ function InvestPage() {
   const balance = num(profile?.wallet_balance);
   const coin = coins.find((c) => c.symbol.toUpperCase() === asset);
   const assetUnits = coin && amount ? amount / coin.current_price : null;
-  const payments = (settings?.payments ?? {}) as Record<string, string | boolean>;
+  const payments = (settings?.['payments'] ?? {}) as Record<string, string | boolean>;
 
   const assets = ["USD", ...coins.slice(0, 6).map((c) => c.symbol.toUpperCase())];
 
   async function invest() {
-    if (!plan) return toast.error("Choose a lock term first");
-    if (amount > balance) return toast.error("That is more than your wallet balance");
+    if (!plan) {
+      toast.error("Choose a lock term first");
+      return;
+    }
+    if (amount > balance) {
+      toast.error("That is more than your wallet balance");
+      return;
+    }
     setBusy(true);
     const { error } = await supabase.rpc("place_investment", {
       _plan_id: plan.id,
@@ -56,7 +62,10 @@ function InvestPage() {
       _asset: asset,
     });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Position opened — your ROI starts accruing now");
     qc.invalidateQueries();
     navigate({ to: "/portfolio" });
@@ -186,7 +195,7 @@ function InvestPage() {
                 </div>
               ))}
             </dl>
-            {Boolean(payments.live) && (
+            {Boolean(payments['live']) && (
               <p className="mt-4 rounded-lg border border-border p-3 text-xs text-muted-foreground">
                 Funding destination for {asset}:{" "}
                 {(payments[`${asset.toLowerCase()}_address`] as string) ||
