@@ -1,0 +1,154 @@
+import { useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
+import { profileQuery, withdrawalsQuery, settingsQuery } from "@/lib/queries";
+import { usd, shortDate, num } from "@/lib/format";
+import { PageHeader } from "@/components/app/PageHeader";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+export const Route = createFileRoute("/_authenticated/withdraw")({
+  head: () => ({
+    meta: [
+      { title: "Withdraw — Terravest" },
+      { name: "description", content: "Request a payout to crypto or PayPal and track its status." },
+      { property: "og:title", content: "Withdraw — Terravest" },
+      { property: "og:description", content: "Request a payout and track its status." },
+    ],
+  }),
+  component: Withdraw,
+});
+
+const methods = ["Bitcoin", "Ethereum", "USDT (TRC20)", "PayPal"];
+
+function Withdraw() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const { data: profile } = useQuery(profileQuery(user?.id));
+  const { data: requests = [] } = useQuery(withdrawalsQuery(user?.id));
+  const { data: settings } = useQuery(settingsQuery);
+  const [amount, setAmount] = useState(100);
+  const [method, setMethod] = useState(methods[0]!);
+  const [destination, setDestination] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const minWithdrawal = num(
+    (settings?.["platform"] as { min_withdrawal?: number } | undefined)?.["min_withdrawal"] ?? 0,
+  );
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    const { error } = await supabase.rpc("request_withdrawal", {
+      _amount: amount,
+      _method: method,
+      _destination: destination,
+    });
+    setBusy(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Request submitted — our team reviews it shortly");
+    setDestination("");
+    qc.invalidateQueries();
+  }
+
+  return (
+    <div className="mx-auto w-full max-w-4xl">
+      <PageHeader
+        title="Withdraw"
+        subtitle={`Available: ${usd(profile?.wallet_balance)} · minimum ${usd(minWithdrawal)}`}
+      />
+
+      <form onSubmit={submit} className="surface-card grid gap-4 rounded-2xl p-5 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="w-amount">Amount (USD)</Label>
+          <Input
+            id="w-amount"
+            type="number"
+            min={1}
+            value={amount}
+            onChange={(e) => setAmount(Number(e.target.value))}
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Method</Label>
+          <div className="flex flex-wrap gap-2">
+            {methods.map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setMethod(m)}
+                className={
+                  "rounded-full border px-3 py-1.5 text-xs transition-colors " +
+                  (m === method
+                    ? "border-accent bg-accent/15 text-accent"
+                    : "border-border text-muted-foreground hover:text-foreground")
+                }
+              >
+                {m}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="space-y-2 sm:col-span-2">
+          <Label htmlFor="dest">
+            {method === "PayPal" ? "PayPal email" : "Wallet address"}
+          </Label>
+          <Input
+            id="dest"
+            value={destination}
+            onChange={(e) => setDestination(e.target.value)}
+            placeholder={method === "PayPal" ? "you@example.com" : "bc1q…"}
+            required
+          />
+        </div>
+        <Button type="submit" variant="hero" className="sm:col-span-2" disabled={busy}>
+          {busy ? "Submitting…" : `Request ${usd(amount)}`}
+        </Button>
+        <p className="text-xs text-muted-foreground sm:col-span-2">
+          The amount is held from your wallet while the request is reviewed. Rejected requests are
+          refunded in full.
+        </p>
+      </form>
+
+      <h2 className="mt-8 mb-3 text-lg font-semibold">Your requests</h2>
+      <div className="surface-card rounded-2xl">
+        {requests.length === 0 && (
+          <p className="p-5 text-sm text-muted-foreground">No withdrawal requests yet.</p>
+        )}
+        <ul className="divide-y divide-border">
+          {requests.map((r) => (
+            <li key={r.id} className="flex items-center justify-between gap-3 px-4 py-3">
+              <div>
+                <p className="text-sm font-medium">{usd(r.amount)}</p>
+                <p className="text-xs text-muted-foreground">
+                  {r.method} · {r.destination} · {shortDate(r.created_at)}
+                </p>
+                {r.admin_note && <p className="text-xs text-muted-foreground">“{r.admin_note}”</p>}
+              </div>
+              <span
+                className={
+                  "rounded-full px-2 py-1 text-xs " +
+                  (r.status === "pending"
+                    ? "bg-warning/15 text-warning"
+                    : r.status === "rejected"
+                      ? "bg-destructive/15 text-destructive"
+                      : "bg-success/15 text-success")
+                }
+              >
+                {r.status}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
