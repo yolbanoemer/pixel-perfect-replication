@@ -41,7 +41,7 @@ function Transfers() {
     const { error } = await supabase.rpc("send_transfer", {
       _username: username,
       _amount: amount,
-      _note: note || null,
+      _note: note || undefined,
     });
     setBusy(false);
     if (error) {
