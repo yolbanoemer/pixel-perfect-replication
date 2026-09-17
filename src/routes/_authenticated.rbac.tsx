@@ -130,7 +130,15 @@ function Rates({ isAdmin }: { isAdmin: boolean }) {
   const { data: plans = [] } = useQuery(plansQuery(true));
   const [draft, setDraft] = useState({ name: "", lock_days: 30, daily_rate: 0.7, min_amount: 100 });
 
-  async function update(id: string, patch: Record<string, unknown>) {
+  async function update(
+    id: string,
+    patch: Partial<{
+      lock_days: number;
+      daily_rate: number;
+      min_amount: number;
+      is_active: boolean;
+    }>,
+  ) {
     const { error } = await supabase.from("plans").update(patch).eq("id", id);
     if (error) {
       toast.error(error.message);
@@ -434,9 +442,9 @@ function Payouts() {
     const note = status === "rejected" ? window.prompt("Reason for rejection:", "") : null;
     if (status === "rejected" && note === null) return;
     const { error } = await supabase.rpc("resolve_withdrawal", {
-      _withdrawal_id: id,
+      _id: id,
       _status: status as never,
-      _note: note ?? undefined,
+      ...(note ? { _note: note } : {}),
     });
     if (error) {
       toast.error(error.message);
