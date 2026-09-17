@@ -3,16 +3,19 @@ import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/lib/auth";
+import { useLang, type TKey } from "@/lib/i18n";
 import { Logo } from "./Logo";
+import { LanguageToggle } from "./LanguageToggle";
 
 const links = [
-  { to: "/", label: "Home" },
-  { to: "/plans", label: "Plans" },
-  { to: "/market", label: "Markets" },
-] as const;
+  { to: "/", label: "nav.home" },
+  { to: "/plans", label: "nav.plans" },
+  { to: "/market", label: "nav.markets" },
+] as const satisfies ReadonlyArray<{ to: string; label: TKey }>;
 
 export function SiteHeader() {
   const { session } = useAuth();
+  const { t } = useLang();
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
@@ -30,31 +33,32 @@ export function SiteHeader() {
               activeProps={{ className: "text-foreground" }}
               activeOptions={{ exact: l.to === "/" }}
             >
-              {l.label}
+              {t(l.label)}
             </Link>
           ))}
         </nav>
 
         <div className="flex items-center gap-2">
+          <LanguageToggle />
+
           {session ? (
             <Button asChild variant="hero" size="sm">
-              <Link to="/dashboard">Dashboard</Link>
+              <Link to="/dashboard">{t("nav.dashboard")}</Link>
             </Button>
           ) : (
             <>
               <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
-                <Link to="/auth">Sign in</Link>
+                <Link to="/auth">{t("nav.signin")}</Link>
               </Button>
-              <Button asChild variant="hero" size="sm">
-                <Link to="/auth">Open account</Link>
+              <Button asChild variant="hero" size="sm" className="hidden sm:inline-flex">
+                <Link to="/auth">{t("nav.open")}</Link>
               </Button>
-
             </>
           )}
 
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
+              <Button variant="ghost" size="icon" className="md:hidden" aria-label={t("nav.menu")}>
                 <Menu className="size-5" />
               </Button>
             </SheetTrigger>
@@ -68,15 +72,16 @@ export function SiteHeader() {
                     activeProps={{ className: "text-foreground" }}
                     activeOptions={{ exact: l.to === "/" }}
                   >
-                    {l.label}
+                    {t(l.label)}
                   </Link>
                 ))}
                 <Link
                   to={session ? "/dashboard" : "/auth"}
                   className="rounded-md px-3 py-3 text-base text-foreground"
                 >
-                  {session ? "Dashboard" : "Sign in"}
+                  {session ? t("nav.dashboard") : t("nav.signin")}
                 </Link>
+                <LanguageToggle className="mt-4 w-full justify-center" />
               </nav>
             </SheetContent>
           </Sheet>
