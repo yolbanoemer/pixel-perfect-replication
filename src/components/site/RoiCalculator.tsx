@@ -3,10 +3,12 @@ import type { Plan } from "@/lib/queries";
 import { usd, pct, projectedTotal } from "@/lib/format";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useLang } from "@/lib/i18n";
 
 export function RoiCalculator({ plans }: { plans: Plan[] }) {
   const [amount, setAmount] = useState(2500);
   const [planId, setPlanId] = useState<string | null>(null);
+  const { t } = useLang();
   const plan = useMemo(
     () => plans.find((p) => p.id === planId) ?? plans[2] ?? plans[0],
     [plans, planId],
@@ -21,7 +23,7 @@ export function RoiCalculator({ plans }: { plans: Plan[] }) {
     <div className="surface-card rounded-2xl p-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="calc-amount">Amount (USD)</Label>
+          <Label htmlFor="calc-amount">{t("calc.amount")}</Label>
           <Input
             id="calc-amount"
             type="number"
@@ -31,7 +33,7 @@ export function RoiCalculator({ plans }: { plans: Plan[] }) {
           />
         </div>
         <div className="space-y-2">
-          <Label>Lock term</Label>
+          <Label>{t("calc.term")}</Label>
           <div className="flex flex-wrap gap-2">
             {plans.map((p) => (
               <button
@@ -54,10 +56,10 @@ export function RoiCalculator({ plans }: { plans: Plan[] }) {
 
       <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
-          { k: "Daily rate", v: pct(plan.daily_rate) },
-          { k: "Per day", v: usd(daily) },
-          { k: "Total ROI", v: usd(total - amount) },
-          { k: "At unlock", v: usd(total) },
+          { k: t("calc.dailyRate"), v: pct(plan.daily_rate) },
+          { k: t("calc.perDay"), v: usd(daily) },
+          { k: t("calc.totalRoi"), v: usd(total - amount) },
+          { k: t("calc.atUnlock"), v: usd(total) },
         ].map((s) => (
           <div key={s.k}>
             <p className="text-xs tracking-wide text-muted-foreground uppercase">{s.k}</p>

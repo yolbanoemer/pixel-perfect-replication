@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { MarketTable } from "@/components/site/MarketTable";
 import { marketQuery } from "@/lib/queries";
+import { useLang } from "@/lib/i18n";
 
 export const Route = createFileRoute("/market")({
   head: () => ({
@@ -26,15 +27,14 @@ export const Route = createFileRoute("/market")({
 
 function MarketPage() {
   const { data, isLoading, error } = useQuery(marketQuery);
+  const { t } = useLang();
 
   return (
     <div className="min-h-screen">
       <SiteHeader />
       <main className="mx-auto w-full max-w-6xl px-4 py-14">
-        <h1 className="text-3xl font-semibold sm:text-4xl">Markets</h1>
-        <p className="mt-3 max-w-xl text-muted-foreground">
-          Live prices refresh every minute. Use them to size a position before you lock.
-        </p>
+        <h1 className="text-3xl font-semibold sm:text-4xl">{t("market.h1")}</h1>
+        <p className="mt-3 max-w-xl text-muted-foreground">{t("market.lead")}</p>
         <div className="mt-8">
           <MarketTable coins={data ?? []} loading={isLoading} error={error as Error | null} />
         </div>
