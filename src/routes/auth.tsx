@@ -56,7 +56,7 @@ function AuthPage() {
         });
         if (error) throw error;
         if (!data.session) {
-          toast.success("Check your inbox to confirm your email, then sign in.");
+          toast.success(t("auth.checkInbox"));
           setMode("signin");
         } else {
           navigate({ to: "/dashboard" });
@@ -67,7 +67,7 @@ function AuthPage() {
         navigate({ to: "/dashboard" });
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      toast.error(err instanceof Error ? err.message : t("auth.generic"));
     } finally {
       setBusy(false);
     }
@@ -78,7 +78,7 @@ function AuthPage() {
       redirect_uri: window.location.origin,
     });
     if (result.error) {
-      toast.error("Google sign-in failed. Please try again.");
+      toast.error(t("auth.googleFailed"));
       return;
     }
     if (result.redirected) return;
