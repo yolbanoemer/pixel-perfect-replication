@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { plansQuery, marketQuery } from "@/lib/queries";
 import { usd, pct } from "@/lib/format";
 import { RoiCalculator } from "@/components/site/RoiCalculator";
+import { useLang } from "@/lib/i18n";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,6 +33,7 @@ function Landing() {
   const { data: plans = [] } = useQuery(plansQuery());
   const { data: coins = [] } = useQuery(marketQuery);
   const top = coins.slice(0, 5);
+  const { t } = useLang();
 
   return (
     <div className="min-h-screen">
@@ -44,32 +46,28 @@ function Landing() {
             <div>
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
                 <span className="size-1.5 rounded-full bg-success" />
-                Daily ROI accrues every second
+                {t("home.badge")}
               </span>
               <h1 className="mt-5 text-4xl leading-[1.05] font-semibold sm:text-5xl md:text-6xl">
-                Lock your capital. <span className="brand-text">Watch it work.</span>
+                {t("home.h1a")} <span className="brand-text">{t("home.h1b")}</span>
               </h1>
-              <p className="mt-5 max-w-lg text-base text-muted-foreground">
-                Terravest turns a fixed lock period into a visible, second-by-second return. Choose
-                a term from one day to two years, fund in crypto or cash, and follow every cent as
-                it accrues.
-              </p>
+              <p className="mt-5 max-w-lg text-base text-muted-foreground">{t("home.lead")}</p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button asChild variant="hero" size="lg">
                   <Link to="/auth">
-                    Open an account <ArrowRight className="size-4" />
+                    {t("home.cta")} <ArrowRight className="size-4" />
                   </Link>
                 </Button>
                 <Button asChild variant="glass" size="lg">
-                  <Link to="/plans">See the rates</Link>
+                  <Link to="/plans">{t("home.rates")}</Link>
                 </Button>
               </div>
 
               <dl className="mt-10 grid max-w-md grid-cols-3 gap-4">
                 {[
-                  { k: "Terms", v: "1d – 2y" },
-                  { k: "Top rate", v: "0.90%/day" },
-                  { k: "Payout", v: "At unlock" },
+                  { k: t("home.stat.terms"), v: t("home.stat.termsV") },
+                  { k: t("home.stat.top"), v: t("home.stat.topV") },
+                  { k: t("home.stat.payout"), v: t("home.stat.payoutV") },
                 ].map((s) => (
                   <div key={s.k}>
                     <dt className="text-xs tracking-wide text-muted-foreground uppercase">{s.k}</dt>
@@ -82,7 +80,7 @@ function Landing() {
             <div className="relative">
               <img
                 src={heroImage}
-                alt="Sculpted walnut and brushed-steel waves forming a rising market chart"
+                alt={t("home.heroAlt")}
                 width={1600}
                 height={1104}
                 className="elevated w-full rounded-2xl border border-border object-cover"
@@ -110,29 +108,13 @@ function Landing() {
         )}
 
         <section className="mx-auto w-full max-w-6xl px-4 py-16 md:py-20">
-          <h2 className="text-2xl font-semibold sm:text-3xl">How a Terravest position works</h2>
+          <h2 className="text-2xl font-semibold sm:text-3xl">{t("home.how")}</h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              {
-                icon: Lock,
-                title: "Pick a lock term",
-                body: "Longer locks carry a higher daily rate, published openly and set by the platform team.",
-              },
-              {
-                icon: LineChart,
-                title: "Watch it accrue",
-                body: "Your position ticks up live — no waiting for a nightly batch to tell you where you stand.",
-              },
-              {
-                icon: Send,
-                title: "Move value freely",
-                body: "Send funds to any other member by username, instantly, with a receipt on both sides.",
-              },
-              {
-                icon: ShieldCheck,
-                title: "Withdraw on review",
-                body: "Requests are held and reviewed by the team, then paid to your chosen destination.",
-              },
+              { icon: Lock, title: t("home.f1.t"), body: t("home.f1.b") },
+              { icon: LineChart, title: t("home.f2.t"), body: t("home.f2.b") },
+              { icon: Send, title: t("home.f3.t"), body: t("home.f3.b") },
+              { icon: ShieldCheck, title: t("home.f4.t"), body: t("home.f4.b") },
             ].map((f) => (
               <article key={f.title} className="surface-card rounded-xl p-5">
                 <f.icon className="size-5 text-accent" />
@@ -146,31 +128,31 @@ function Landing() {
         <section className="mx-auto w-full max-w-6xl px-4 pb-16 md:pb-20">
           <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:items-start">
             <div>
-              <h2 className="text-2xl font-semibold sm:text-3xl">Run the numbers first</h2>
-              <p className="mt-3 max-w-lg text-sm text-muted-foreground">
-                Every rate on this page is the same rate applied to a live position. Try an amount
-                and a term to see the unlock value before you commit anything.
-              </p>
+              <h2 className="text-2xl font-semibold sm:text-3xl">{t("home.calc.h")}</h2>
+              <p className="mt-3 max-w-lg text-sm text-muted-foreground">{t("home.calc.b")}</p>
               <div className="mt-6">
                 <RoiCalculator plans={plans} />
               </div>
             </div>
 
             <div className="surface-card rounded-2xl p-6">
-              <h3 className="font-display text-lg font-semibold">Current terms</h3>
+              <h3 className="font-display text-lg font-semibold">{t("home.terms.h")}</h3>
               <ul className="mt-4 divide-y divide-border">
                 {plans.map((p) => (
                   <li key={p.id} className="flex items-center justify-between py-3 text-sm">
                     <span>{p.name}</span>
                     <span className="flex items-center gap-3">
                       <span className="text-muted-foreground">{p.lock_days}d</span>
-                      <span className="font-medium text-accent">{pct(p.daily_rate)}/day</span>
+                      <span className="font-medium text-accent">
+                        {pct(p.daily_rate)}
+                        {t("home.perDay")}
+                      </span>
                     </span>
                   </li>
                 ))}
               </ul>
               <Button asChild variant="hero" className="mt-6 w-full">
-                <Link to="/auth">Start with any amount</Link>
+                <Link to="/auth">{t("home.terms.cta")}</Link>
               </Button>
             </div>
           </div>

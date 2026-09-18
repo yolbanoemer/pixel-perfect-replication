@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/site/Logo";
+import { LanguageToggle } from "@/components/site/LanguageToggle";
+import { useLang } from "@/lib/i18n";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -33,6 +35,7 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
   const { session } = useAuth();
+  const { t } = useLang();
 
   useEffect(() => {
     if (session) navigate({ to: "/dashboard", replace: true });
@@ -53,7 +56,7 @@ function AuthPage() {
         });
         if (error) throw error;
         if (!data.session) {
-          toast.success("Check your inbox to confirm your email, then sign in.");
+          toast.success(t("auth.checkInbox"));
           setMode("signin");
         } else {
           navigate({ to: "/dashboard" });
@@ -64,7 +67,7 @@ function AuthPage() {
         navigate({ to: "/dashboard" });
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      toast.error(err instanceof Error ? err.message : t("auth.generic"));
     } finally {
       setBusy(false);
     }
@@ -75,7 +78,7 @@ function AuthPage() {
       redirect_uri: window.location.origin,
     });
     if (result.error) {
-      toast.error("Google sign-in failed. Please try again.");
+      toast.error(t("auth.googleFailed"));
       return;
     }
     if (result.redirected) return;
@@ -86,25 +89,26 @@ function AuthPage() {
     <div className="relative flex min-h-screen items-center justify-center px-4 py-12">
       <div className="halo pointer-events-none absolute inset-0" />
       <div className="relative w-full max-w-md">
-        <Link to="/" className="flex justify-center">
-          <Logo />
-        </Link>
+        <div className="flex flex-col items-center gap-4">
+          <Link to="/" className="flex justify-center">
+            <Logo />
+          </Link>
+          <LanguageToggle />
+        </div>
 
         <div className="surface-card mt-8 rounded-2xl p-7">
           <h1 className="text-xl font-semibold">
-            {mode === "signin" ? "Welcome back" : "Open your account"}
+            {mode === "signin" ? t("auth.welcome") : t("auth.open")}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {mode === "signin"
-              ? "Sign in to your wallet and positions."
-              : "A username lets other members send you funds."}
+            {mode === "signin" ? t("auth.signinSub") : t("auth.signupSub")}
           </p>
 
           <form onSubmit={submit} className="mt-6 space-y-4">
             {mode === "signup" && (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
+                  <Label htmlFor="username">{t("auth.username")}</Label>
                   <Input
                     id="username"
                     value={username}
@@ -114,7 +118,7 @@ function AuthPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="fullname">Full name</Label>
+                  <Label htmlFor="fullname">{t("auth.fullName")}</Label>
                   <Input
                     id="fullname"
                     value={fullName}
@@ -125,7 +129,7 @@ function AuthPage() {
               </>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("auth.email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -135,7 +139,7 @@ function AuthPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t("auth.password")}</Label>
               <Input
                 id="password"
                 type="password"
@@ -147,28 +151,28 @@ function AuthPage() {
             </div>
 
             <Button type="submit" variant="hero" className="w-full" disabled={busy}>
-              {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
+              {busy ? t("auth.wait") : mode === "signin" ? t("auth.signin") : t("auth.create")}
             </Button>
           </form>
 
           <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
             <span className="grain-divider flex-1" />
-            or
+            {t("auth.or")}
             <span className="grain-divider flex-1" />
           </div>
 
           <Button variant="glass" className="w-full" onClick={google} type="button">
-            Continue with Google
+            {t("auth.google")}
           </Button>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            {mode === "signin" ? "New to Terravest?" : "Already have an account?"}{" "}
+            {mode === "signin" ? t("auth.newHere") : t("auth.haveAccount")}{" "}
             <button
               type="button"
               className="text-accent hover:underline"
               onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
             >
-              {mode === "signin" ? "Open an account" : "Sign in"}
+              {mode === "signin" ? t("auth.toSignup") : t("auth.signin")}
             </button>
           </p>
         </div>
