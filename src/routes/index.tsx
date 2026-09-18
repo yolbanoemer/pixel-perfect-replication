@@ -136,14 +136,17 @@ function Landing() {
             </div>
 
             <div className="surface-card rounded-2xl p-6">
-              <h3 className="font-display text-lg font-semibold">Current terms</h3>
+              <h3 className="font-display text-lg font-semibold">{t("home.terms.h")}</h3>
               <ul className="mt-4 divide-y divide-border">
                 {plans.map((p) => (
                   <li key={p.id} className="flex items-center justify-between py-3 text-sm">
                     <span>{p.name}</span>
                     <span className="flex items-center gap-3">
                       <span className="text-muted-foreground">{p.lock_days}d</span>
-                      <span className="font-medium text-accent">{pct(p.daily_rate)}/day</span>
+                      <span className="font-medium text-accent">
+                        {pct(p.daily_rate)}
+                        {t("home.perDay")}
+                      </span>
                     </span>
                   </li>
                 ))}
