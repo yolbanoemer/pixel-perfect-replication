@@ -152,7 +152,7 @@ function Landing() {
                 ))}
               </ul>
               <Button asChild variant="hero" className="mt-6 w-full">
-                <Link to="/auth">Start with any amount</Link>
+                <Link to="/auth">{t("home.terms.cta")}</Link>
               </Button>
             </div>
           </div>
