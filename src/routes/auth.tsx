@@ -35,6 +35,7 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
   const { session } = useAuth();
+  const { t } = useLang();
 
   useEffect(() => {
     if (session) navigate({ to: "/dashboard", replace: true });
