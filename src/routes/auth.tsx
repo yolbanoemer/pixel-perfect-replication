@@ -89,18 +89,19 @@ function AuthPage() {
     <div className="relative flex min-h-screen items-center justify-center px-4 py-12">
       <div className="halo pointer-events-none absolute inset-0" />
       <div className="relative w-full max-w-md">
-        <Link to="/" className="flex justify-center">
-          <Logo />
-        </Link>
+        <div className="flex flex-col items-center gap-4">
+          <Link to="/" className="flex justify-center">
+            <Logo />
+          </Link>
+          <LanguageToggle />
+        </div>
 
         <div className="surface-card mt-8 rounded-2xl p-7">
           <h1 className="text-xl font-semibold">
-            {mode === "signin" ? "Welcome back" : "Open your account"}
+            {mode === "signin" ? t("auth.welcome") : t("auth.open")}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {mode === "signin"
-              ? "Sign in to your wallet and positions."
-              : "A username lets other members send you funds."}
+            {mode === "signin" ? t("auth.signinSub") : t("auth.signupSub")}
           </p>
 
           <form onSubmit={submit} className="mt-6 space-y-4">
