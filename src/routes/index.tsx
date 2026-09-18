@@ -80,7 +80,7 @@ function Landing() {
             <div className="relative">
               <img
                 src={heroImage}
-                alt="Sculpted walnut and brushed-steel waves forming a rising market chart"
+                alt={t("home.heroAlt")}
                 width={1600}
                 height={1104}
                 className="elevated w-full rounded-2xl border border-border object-cover"
@@ -108,29 +108,13 @@ function Landing() {
         )}
 
         <section className="mx-auto w-full max-w-6xl px-4 py-16 md:py-20">
-          <h2 className="text-2xl font-semibold sm:text-3xl">How a Terravest position works</h2>
+          <h2 className="text-2xl font-semibold sm:text-3xl">{t("home.how")}</h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              {
-                icon: Lock,
-                title: "Pick a lock term",
-                body: "Longer locks carry a higher daily rate, published openly and set by the platform team.",
-              },
-              {
-                icon: LineChart,
-                title: "Watch it accrue",
-                body: "Your position ticks up live — no waiting for a nightly batch to tell you where you stand.",
-              },
-              {
-                icon: Send,
-                title: "Move value freely",
-                body: "Send funds to any other member by username, instantly, with a receipt on both sides.",
-              },
-              {
-                icon: ShieldCheck,
-                title: "Withdraw on review",
-                body: "Requests are held and reviewed by the team, then paid to your chosen destination.",
-              },
+              { icon: Lock, title: t("home.f1.t"), body: t("home.f1.b") },
+              { icon: LineChart, title: t("home.f2.t"), body: t("home.f2.b") },
+              { icon: Send, title: t("home.f3.t"), body: t("home.f3.b") },
+              { icon: ShieldCheck, title: t("home.f4.t"), body: t("home.f4.b") },
             ].map((f) => (
               <article key={f.title} className="surface-card rounded-xl p-5">
                 <f.icon className="size-5 text-accent" />
