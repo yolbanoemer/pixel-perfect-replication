@@ -128,11 +128,8 @@ function Landing() {
         <section className="mx-auto w-full max-w-6xl px-4 pb-16 md:pb-20">
           <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:items-start">
             <div>
-              <h2 className="text-2xl font-semibold sm:text-3xl">Run the numbers first</h2>
-              <p className="mt-3 max-w-lg text-sm text-muted-foreground">
-                Every rate on this page is the same rate applied to a live position. Try an amount
-                and a term to see the unlock value before you commit anything.
-              </p>
+              <h2 className="text-2xl font-semibold sm:text-3xl">{t("home.calc.h")}</h2>
+              <p className="mt-3 max-w-lg text-sm text-muted-foreground">{t("home.calc.b")}</p>
               <div className="mt-6">
                 <RoiCalculator plans={plans} />
               </div>
