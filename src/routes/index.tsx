@@ -46,32 +46,28 @@ function Landing() {
             <div>
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
                 <span className="size-1.5 rounded-full bg-success" />
-                Daily ROI accrues every second
+                {t("home.badge")}
               </span>
               <h1 className="mt-5 text-4xl leading-[1.05] font-semibold sm:text-5xl md:text-6xl">
-                Lock your capital. <span className="brand-text">Watch it work.</span>
+                {t("home.h1a")} <span className="brand-text">{t("home.h1b")}</span>
               </h1>
-              <p className="mt-5 max-w-lg text-base text-muted-foreground">
-                Terravest turns a fixed lock period into a visible, second-by-second return. Choose
-                a term from one day to two years, fund in crypto or cash, and follow every cent as
-                it accrues.
-              </p>
+              <p className="mt-5 max-w-lg text-base text-muted-foreground">{t("home.lead")}</p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button asChild variant="hero" size="lg">
                   <Link to="/auth">
-                    Open an account <ArrowRight className="size-4" />
+                    {t("home.cta")} <ArrowRight className="size-4" />
                   </Link>
                 </Button>
                 <Button asChild variant="glass" size="lg">
-                  <Link to="/plans">See the rates</Link>
+                  <Link to="/plans">{t("home.rates")}</Link>
                 </Button>
               </div>
 
               <dl className="mt-10 grid max-w-md grid-cols-3 gap-4">
                 {[
-                  { k: "Terms", v: "1d – 2y" },
-                  { k: "Top rate", v: "0.90%/day" },
-                  { k: "Payout", v: "At unlock" },
+                  { k: t("home.stat.terms"), v: t("home.stat.termsV") },
+                  { k: t("home.stat.top"), v: t("home.stat.topV") },
+                  { k: t("home.stat.payout"), v: t("home.stat.payoutV") },
                 ].map((s) => (
                   <div key={s.k}>
                     <dt className="text-xs tracking-wide text-muted-foreground uppercase">{s.k}</dt>
