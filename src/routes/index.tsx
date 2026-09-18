@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { plansQuery, marketQuery } from "@/lib/queries";
 import { usd, pct } from "@/lib/format";
 import { RoiCalculator } from "@/components/site/RoiCalculator";
+import { useLang } from "@/lib/i18n";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,6 +33,7 @@ function Landing() {
   const { data: plans = [] } = useQuery(plansQuery());
   const { data: coins = [] } = useQuery(marketQuery);
   const top = coins.slice(0, 5);
+  const { t } = useLang();
 
   return (
     <div className="min-h-screen">
