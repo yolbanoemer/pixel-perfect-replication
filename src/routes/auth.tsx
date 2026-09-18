@@ -108,7 +108,7 @@ function AuthPage() {
             {mode === "signup" && (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
+                  <Label htmlFor="username">{t("auth.username")}</Label>
                   <Input
                     id="username"
                     value={username}
@@ -118,7 +118,7 @@ function AuthPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="fullname">Full name</Label>
+                  <Label htmlFor="fullname">{t("auth.fullName")}</Label>
                   <Input
                     id="fullname"
                     value={fullName}
@@ -129,7 +129,7 @@ function AuthPage() {
               </>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("auth.email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -139,7 +139,7 @@ function AuthPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t("auth.password")}</Label>
               <Input
                 id="password"
                 type="password"
@@ -151,28 +151,28 @@ function AuthPage() {
             </div>
 
             <Button type="submit" variant="hero" className="w-full" disabled={busy}>
-              {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
+              {busy ? t("auth.wait") : mode === "signin" ? t("auth.signin") : t("auth.create")}
             </Button>
           </form>
 
           <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
             <span className="grain-divider flex-1" />
-            or
+            {t("auth.or")}
             <span className="grain-divider flex-1" />
           </div>
 
           <Button variant="glass" className="w-full" onClick={google} type="button">
-            Continue with Google
+            {t("auth.google")}
           </Button>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            {mode === "signin" ? "New to Terravest?" : "Already have an account?"}{" "}
+            {mode === "signin" ? t("auth.newHere") : t("auth.haveAccount")}{" "}
             <button
               type="button"
               className="text-accent hover:underline"
               onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
             >
-              {mode === "signin" ? "Open an account" : "Sign in"}
+              {mode === "signin" ? t("auth.toSignup") : t("auth.signin")}
             </button>
           </p>
         </div>
