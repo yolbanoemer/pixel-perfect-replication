@@ -10,6 +10,7 @@ import {
   allRolesQuery,
   allTicketsQuery,
   allWithdrawalsQuery,
+  allDepositsQuery,
   announcementsQuery,
   plansQuery,
   settingsQuery,
@@ -38,6 +39,7 @@ const tabs = [
   "Rates & terms",
   "Members",
   "Positions",
+  "Deposits",
   "Payouts",
   "Announcements",
   "Tickets",
@@ -87,6 +89,7 @@ function ControlRoom() {
       {tab === "Rates & terms" && <Rates isAdmin={isAdmin} />}
       {tab === "Members" && <Members isAdmin={isAdmin} />}
       {tab === "Positions" && <Positions />}
+      {tab === "Deposits" && <Deposits />}
       {tab === "Payouts" && <Payouts />}
       {tab === "Announcements" && <Announcements />}
       {tab === "Tickets" && <Tickets />}
@@ -430,6 +433,62 @@ function Positions() {
           </tbody>
         </table>
       </div>
+    </Panel>
+  );
+}
+
+function Deposits() {
+  const qc = useQueryClient();
+  const { data: deposits = [] } = useQuery(allDepositsQuery);
+
+  async function resolve(id: string, status: "confirmed" | "rejected") {
+    const note =
+      status === "rejected" ? window.prompt("Reason for rejection:", "") : window.prompt("Note (optional):", "");
+    if (status === "rejected" && note === null) return;
+    const { error } = await supabase.rpc("resolve_deposit", {
+      _id: id,
+      _status: status,
+      ...(note ? { _note: note } : {}),
+    });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(status === "confirmed" ? "Deposit credited" : "Deposit rejected");
+    qc.invalidateQueries();
+  }
+
+  return (
+    <Panel>
+      {deposits.length === 0 && (
+        <p className="text-sm text-muted-foreground">No deposit requests yet.</p>
+      )}
+      <ul className="divide-y divide-border">
+        {deposits.map((d) => (
+          <li key={d.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+            <div className="min-w-0">
+              <p className="text-sm font-medium">
+                {usd(d.amount)} · @{(d.profiles as { username?: string } | null)?.username ?? "—"}
+              </p>
+              <p className="truncate text-xs text-muted-foreground">
+                {d.method} · {d.asset} · {d.reference ?? "no reference"} · {shortDate(d.created_at)}
+              </p>
+            </div>
+            {d.status === "pending" ? (
+              <div className="flex gap-2">
+                <Button size="sm" variant="hero" onClick={() => resolve(d.id, "confirmed")}>
+                  Confirm & credit
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => resolve(d.id, "rejected")}>
+                  Reject
+                </Button>
+              </div>
+            ) : (
+              <span className="rounded-full bg-muted px-2 py-1 text-xs">{d.status}</span>
+            )}
+          </li>
+        ))}
+      </ul>
     </Panel>
   );
 }
