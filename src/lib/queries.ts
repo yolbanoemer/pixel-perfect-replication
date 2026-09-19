@@ -210,3 +210,31 @@ export const allTicketsQuery = queryOptions({
     return data ?? [];
   },
 });
+
+export const depositsQuery = (userId: string | undefined) =>
+  queryOptions({
+    queryKey: ["deposits", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("deposits")
+        .select("*")
+        .eq("user_id", userId!)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+export const allDepositsQuery = queryOptions({
+  queryKey: ["admin", "deposits"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("deposits")
+      .select("*, profiles:user_id(username)")
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw error;
+    return data ?? [];
+  },
+});
