@@ -10,12 +10,10 @@ import {
   investmentsQuery,
   transactionsQuery,
   announcementsQuery,
-  settingsQuery,
 } from "@/lib/queries";
 import { usd, pct, accruedRoi, timeLeft, shortDate, num } from "@/lib/format";
 import { PageHeader, StatCard } from "@/components/app/PageHeader";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -36,9 +34,7 @@ function Dashboard() {
   const { data: investments = [] } = useQuery(investmentsQuery(user?.id));
   const { data: txs = [] } = useQuery(transactionsQuery(user?.id, 8));
   const { data: announcements = [] } = useQuery(announcementsQuery);
-  const { data: settings } = useQuery(settingsQuery);
   const [tick, setTick] = useState(Date.now());
-  const [topupAmount, setTopupAmount] = useState(1000);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -51,19 +47,6 @@ function Dashboard() {
   const totalLocked = active.reduce((s, i) => s + num(i.amount_usd), 0);
   const liveRoi = active.reduce((s, i) => s + accruedRoi(i, tick), 0);
   const dailyRate = active.reduce((s, i) => s + num(i.amount_usd) * (num(i.daily_rate) / 100), 0);
-  const paymentsLive = Boolean((settings?.['payments'] as { live?: boolean } | undefined)?.['live']);
-
-  async function topUp() {
-    setBusy(true);
-    const { error } = await supabase.rpc("demo_topup", { _amount: topupAmount });
-    setBusy(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success(`${usd(topupAmount)} added to your practice wallet`);
-    qc.invalidateQueries();
-  }
 
   async function settle() {
     setBusy(true);
@@ -107,27 +90,18 @@ function Dashboard() {
         <StatCard label="Earning per day" value={usd(dailyRate)} tone="accent" />
       </div>
 
-      {!paymentsLive && (
-        <div className="surface-card mt-6 flex flex-wrap items-center gap-3 rounded-xl p-4">
-          <div className="flex-1 min-w-52">
-            <p className="text-sm font-medium">Practice mode</p>
-            <p className="text-xs text-muted-foreground">
-              Real payments are switched off, so you can fund a practice wallet and test the full
-              flow. An admin turns real funding on in the control room.
-            </p>
-          </div>
-          <Input
-            type="number"
-            className="w-32"
-            value={topupAmount}
-            min={1}
-            onChange={(e) => setTopupAmount(Number(e.target.value))}
-          />
-          <Button variant="glass" onClick={topUp} disabled={busy}>
-            Add funds
-          </Button>
+      <div className="surface-card mt-6 flex flex-wrap items-center gap-3 rounded-xl p-4">
+        <div className="min-w-52 flex-1">
+          <p className="text-sm font-medium">Fund your wallet</p>
+          <p className="text-xs text-muted-foreground">
+            Add money with crypto (recommended), PayPal or bank transfer. Requests are credited once
+            confirmed by our team.
+          </p>
         </div>
-      )}
+        <Button asChild variant="hero">
+          <Link to="/deposit">Add funds</Link>
+        </Button>
+      </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <section>

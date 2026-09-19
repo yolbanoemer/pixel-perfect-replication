@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as MarketRouteImport } from './routes/market'
 import { Route as PlansRouteImport } from './routes/plans'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
+import { Route as AuthenticatedDepositRouteImport } from './routes/_authenticated.deposit'
 import { Route as AuthenticatedInvestRouteImport } from './routes/_authenticated.invest'
 import { Route as AuthenticatedMarketsRouteImport } from './routes/_authenticated.markets'
 import { Route as AuthenticatedPortfolioRouteImport } from './routes/_authenticated.portfolio'
@@ -51,6 +52,11 @@ const PlansRoute = PlansRouteImport.update({
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDepositRoute = AuthenticatedDepositRouteImport.update({
+  id: '/deposit',
+  path: '/deposit',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedInvestRoute = AuthenticatedInvestRouteImport.update({
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/market': typeof MarketRoute
   '/plans': typeof PlansRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/deposit': typeof AuthenticatedDepositRoute
   '/invest': typeof AuthenticatedInvestRoute
   '/markets': typeof AuthenticatedMarketsRoute
   '/portfolio': typeof AuthenticatedPortfolioRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/market': typeof MarketRoute
   '/plans': typeof PlansRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/deposit': typeof AuthenticatedDepositRoute
   '/invest': typeof AuthenticatedInvestRoute
   '/markets': typeof AuthenticatedMarketsRoute
   '/portfolio': typeof AuthenticatedPortfolioRoute
@@ -132,6 +140,7 @@ export interface FileRoutesById {
   '/market': typeof MarketRoute
   '/plans': typeof PlansRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/deposit': typeof AuthenticatedDepositRoute
   '/_authenticated/invest': typeof AuthenticatedInvestRoute
   '/_authenticated/markets': typeof AuthenticatedMarketsRoute
   '/_authenticated/portfolio': typeof AuthenticatedPortfolioRoute
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/market'
     | '/plans'
     | '/dashboard'
+    | '/deposit'
     | '/invest'
     | '/markets'
     | '/portfolio'
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
     | '/market'
     | '/plans'
     | '/dashboard'
+    | '/deposit'
     | '/invest'
     | '/markets'
     | '/portfolio'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
     | '/market'
     | '/plans'
     | '/_authenticated/dashboard'
+    | '/_authenticated/deposit'
     | '/_authenticated/invest'
     | '/_authenticated/markets'
     | '/_authenticated/portfolio'
@@ -240,6 +252,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/deposit': {
+      id: '/_authenticated/deposit'
+      path: '/deposit'
+      fullPath: '/deposit'
+      preLoaderRoute: typeof AuthenticatedDepositRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/invest': {
@@ -303,6 +322,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDepositRoute: typeof AuthenticatedDepositRoute
   AuthenticatedInvestRoute: typeof AuthenticatedInvestRoute
   AuthenticatedMarketsRoute: typeof AuthenticatedMarketsRoute
   AuthenticatedPortfolioRoute: typeof AuthenticatedPortfolioRoute
@@ -315,6 +335,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDepositRoute: AuthenticatedDepositRoute,
   AuthenticatedInvestRoute: AuthenticatedInvestRoute,
   AuthenticatedMarketsRoute: AuthenticatedMarketsRoute,
   AuthenticatedPortfolioRoute: AuthenticatedPortfolioRoute,

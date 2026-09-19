@@ -44,6 +44,51 @@ export type Database = {
         }
         Relationships: []
       }
+      deposits: {
+        Row: {
+          admin_note: string | null
+          amount: number
+          asset: string
+          country: string | null
+          created_at: string
+          destination: string | null
+          id: string
+          method: Database["public"]["Enums"]["deposit_method"]
+          reference: string | null
+          status: Database["public"]["Enums"]["deposit_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_note?: string | null
+          amount: number
+          asset?: string
+          country?: string | null
+          created_at?: string
+          destination?: string | null
+          id?: string
+          method: Database["public"]["Enums"]["deposit_method"]
+          reference?: string | null
+          status?: Database["public"]["Enums"]["deposit_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_note?: string | null
+          amount?: number
+          asset?: string
+          country?: string | null
+          created_at?: string
+          destination?: string | null
+          id?: string
+          method?: Database["public"]["Enums"]["deposit_method"]
+          reference?: string | null
+          status?: Database["public"]["Enums"]["deposit_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       investments: {
         Row: {
           amount_usd: number
@@ -359,9 +404,28 @@ export type Database = {
         Args: { _amount: number; _asset?: string; _plan_id: string }
         Returns: string
       }
+      request_deposit: {
+        Args: {
+          _amount: number
+          _asset?: string
+          _country?: string
+          _destination?: string
+          _method: Database["public"]["Enums"]["deposit_method"]
+          _reference?: string
+        }
+        Returns: string
+      }
       request_withdrawal: {
         Args: { _amount: number; _destination: string; _method: string }
         Returns: string
+      }
+      resolve_deposit: {
+        Args: {
+          _id: string
+          _note?: string
+          _status: Database["public"]["Enums"]["deposit_status"]
+        }
+        Returns: undefined
       }
       resolve_withdrawal: {
         Args: {
@@ -386,6 +450,8 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "support" | "investor"
+      deposit_method: "bank" | "paypal" | "crypto"
+      deposit_status: "pending" | "confirmed" | "rejected"
       investment_status: "pending" | "active" | "matured" | "cancelled"
       ticket_status: "open" | "in_progress" | "resolved" | "closed"
       tx_status: "pending" | "completed" | "failed"
@@ -527,6 +593,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "support", "investor"],
+      deposit_method: ["bank", "paypal", "crypto"],
+      deposit_status: ["pending", "confirmed", "rejected"],
       investment_status: ["pending", "active", "matured", "cancelled"],
       ticket_status: ["open", "in_progress", "resolved", "closed"],
       tx_status: ["pending", "completed", "failed"],
