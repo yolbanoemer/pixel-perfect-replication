@@ -107,27 +107,18 @@ function Dashboard() {
         <StatCard label="Earning per day" value={usd(dailyRate)} tone="accent" />
       </div>
 
-      {!paymentsLive && (
-        <div className="surface-card mt-6 flex flex-wrap items-center gap-3 rounded-xl p-4">
-          <div className="flex-1 min-w-52">
-            <p className="text-sm font-medium">Practice mode</p>
-            <p className="text-xs text-muted-foreground">
-              Real payments are switched off, so you can fund a practice wallet and test the full
-              flow. An admin turns real funding on in the control room.
-            </p>
-          </div>
-          <Input
-            type="number"
-            className="w-32"
-            value={topupAmount}
-            min={1}
-            onChange={(e) => setTopupAmount(Number(e.target.value))}
-          />
-          <Button variant="glass" onClick={topUp} disabled={busy}>
-            Add funds
-          </Button>
+      <div className="surface-card mt-6 flex flex-wrap items-center gap-3 rounded-xl p-4">
+        <div className="min-w-52 flex-1">
+          <p className="text-sm font-medium">Fund your wallet</p>
+          <p className="text-xs text-muted-foreground">
+            Add money with crypto (recommended), PayPal or bank transfer. Requests are credited once
+            confirmed by our team.
+          </p>
         </div>
-      )}
+        <Button asChild variant="hero">
+          <Link to="/deposit">Add funds</Link>
+        </Button>
+      </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <section>
