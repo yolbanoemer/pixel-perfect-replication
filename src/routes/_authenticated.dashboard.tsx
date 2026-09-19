@@ -10,12 +10,10 @@ import {
   investmentsQuery,
   transactionsQuery,
   announcementsQuery,
-  settingsQuery,
 } from "@/lib/queries";
 import { usd, pct, accruedRoi, timeLeft, shortDate, num } from "@/lib/format";
 import { PageHeader, StatCard } from "@/components/app/PageHeader";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -36,9 +34,7 @@ function Dashboard() {
   const { data: investments = [] } = useQuery(investmentsQuery(user?.id));
   const { data: txs = [] } = useQuery(transactionsQuery(user?.id, 8));
   const { data: announcements = [] } = useQuery(announcementsQuery);
-  const { data: settings } = useQuery(settingsQuery);
   const [tick, setTick] = useState(Date.now());
-  const [topupAmount, setTopupAmount] = useState(1000);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -51,19 +47,6 @@ function Dashboard() {
   const totalLocked = active.reduce((s, i) => s + num(i.amount_usd), 0);
   const liveRoi = active.reduce((s, i) => s + accruedRoi(i, tick), 0);
   const dailyRate = active.reduce((s, i) => s + num(i.amount_usd) * (num(i.daily_rate) / 100), 0);
-  const paymentsLive = Boolean((settings?.['payments'] as { live?: boolean } | undefined)?.['live']);
-
-  async function topUp() {
-    setBusy(true);
-    const { error } = await supabase.rpc("demo_topup", { _amount: topupAmount });
-    setBusy(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success(`${usd(topupAmount)} added to your practice wallet`);
-    qc.invalidateQueries();
-  }
 
   async function settle() {
     setBusy(true);
