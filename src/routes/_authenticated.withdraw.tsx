@@ -23,7 +23,8 @@ export const Route = createFileRoute("/_authenticated/withdraw")({
   component: Withdraw,
 });
 
-const methods = ["Bitcoin", "Ethereum", "USDT (TRC20)", "PayPal"];
+const methods = ["Crypto", "PayPal", "Bank transfer"] as const;
+type Method = (typeof methods)[number];
 
 function Withdraw() {
   const { user } = useAuth();
