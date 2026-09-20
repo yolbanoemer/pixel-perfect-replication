@@ -391,6 +391,24 @@ export type Database = {
         Args: { _amount: number; _note: string; _user_id: string }
         Returns: number
       }
+      admin_award_historical_investment: {
+        Args: {
+          _amount: number
+          _asset: string
+          _plan_id: string
+          _started_at: string
+          _user_id: string
+        }
+        Returns: string
+      }
+      admin_update_investment_dates: {
+        Args: {
+          _investment_id: string
+          _matures_at: string
+          _started_at: string
+        }
+        Returns: undefined
+      }
       demo_topup: { Args: { _amount: number }; Returns: number }
       has_role: {
         Args: {
