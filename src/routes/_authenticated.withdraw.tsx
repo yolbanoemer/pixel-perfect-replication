@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { profileQuery, withdrawalsQuery, settingsQuery } from "@/lib/queries";
 import { usd, shortDate, num } from "@/lib/format";
+import { cryptoNetworks, bankCountries } from "@/lib/deposit";
 import { PageHeader } from "@/components/app/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +24,8 @@ export const Route = createFileRoute("/_authenticated/withdraw")({
   component: Withdraw,
 });
 
-const methods = ["Bitcoin", "Ethereum", "USDT (TRC20)", "PayPal"];
+const methods = ["Crypto", "PayPal", "Bank transfer"] as const;
+type Method = (typeof methods)[number];
 
 function Withdraw() {
   const { user } = useAuth();
@@ -32,7 +34,9 @@ function Withdraw() {
   const { data: requests = [] } = useQuery(withdrawalsQuery(user?.id));
   const { data: settings } = useQuery(settingsQuery);
   const [amount, setAmount] = useState(100);
-  const [method, setMethod] = useState(methods[0]!);
+  const [method, setMethod] = useState<Method>("Crypto");
+  const [coin, setCoin] = useState<string>(cryptoNetworks[0]!.code);
+  const [country, setCountry] = useState(bankCountries[0]!);
   const [destination, setDestination] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -43,9 +47,15 @@ function Withdraw() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
+    const fullMethod =
+      method === "Crypto"
+        ? `Crypto (${coin})`
+        : method === "Bank transfer"
+          ? `Bank transfer (${country})`
+          : "PayPal";
     const { error } = await supabase.rpc("request_withdrawal", {
       _amount: amount,
-      _method: method,
+      _method: fullMethod,
       _destination: destination,
     });
     setBusy(false);
@@ -97,15 +107,64 @@ function Withdraw() {
             ))}
           </div>
         </div>
+        {method === "Crypto" && (
+          <div className="space-y-2 sm:col-span-2">
+            <Label>Coin</Label>
+            <div className="flex flex-wrap gap-2">
+              {cryptoNetworks.map((c) => (
+                <button
+                  key={c.code}
+                  type="button"
+                  onClick={() => setCoin(c.code)}
+                  className={
+                    "rounded-full border px-3 py-1.5 text-xs transition-colors " +
+                    (c.code === coin
+                      ? "border-accent bg-accent/15 text-accent"
+                      : "border-border text-muted-foreground hover:text-foreground")
+                  }
+                >
+                  {c.name} ({c.code})
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {method === "Bank transfer" && (
+          <div className="space-y-2 sm:col-span-2">
+            <Label htmlFor="w-country">Country</Label>
+            <select
+              id="w-country"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              className="h-10 w-full max-w-xs rounded-md border border-border bg-background px-3 text-sm"
+            >
+              {bankCountries.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <div className="space-y-2 sm:col-span-2">
           <Label htmlFor="dest">
-            {method === "PayPal" ? "PayPal email" : "Wallet address"}
+            {method === "PayPal"
+              ? "PayPal email"
+              : method === "Bank transfer"
+                ? "Bank details (account name, IBAN / account number, bank)"
+                : `Your ${coin} wallet address`}
           </Label>
           <Input
             id="dest"
             value={destination}
             onChange={(e) => setDestination(e.target.value)}
-            placeholder={method === "PayPal" ? "you@example.com" : "bc1q…"}
+            placeholder={
+              method === "PayPal"
+                ? "you@example.com"
+                : method === "Bank transfer"
+                  ? "Jane Doe · DE89 3704 0044 0532 0130 00 · Commerzbank"
+                  : "Paste your wallet address"
+            }
             required
           />
         </div>
@@ -114,7 +173,7 @@ function Withdraw() {
         </Button>
         <p className="text-xs text-muted-foreground sm:col-span-2">
           The amount is held from your wallet while the request is reviewed. Rejected requests are
-          refunded in full.
+          refunded in full. Every payout stays pending until our team confirms it.
         </p>
       </form>
 

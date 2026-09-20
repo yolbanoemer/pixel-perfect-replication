@@ -694,7 +694,7 @@ function Payments({ isAdmin }: { isAdmin: boolean }) {
           <div>
             <h3 className="text-sm font-semibold">Real money mode</h3>
             <p className="text-xs text-muted-foreground">
-              While this is off, members fund with practice credit and no real payment is taken.
+              While this is off, deposits are still submitted and reviewed here before any wallet is credited.
             </p>
           </div>
           <Button
@@ -702,7 +702,7 @@ function Payments({ isAdmin }: { isAdmin: boolean }) {
             disabled={!isAdmin}
             onClick={() => saveKey("payments", { ...payments, live: !payments["live"] })}
           >
-            {payments["live"] ? "Live — switch to practice" : "Practice — go live"}
+            {payments["live"] ? "Live — switch off" : "Switch on live payments"}
           </Button>
         </div>
       </Panel>
