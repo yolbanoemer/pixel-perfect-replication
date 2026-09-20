@@ -33,7 +33,9 @@ function Withdraw() {
   const { data: requests = [] } = useQuery(withdrawalsQuery(user?.id));
   const { data: settings } = useQuery(settingsQuery);
   const [amount, setAmount] = useState(100);
-  const [method, setMethod] = useState(methods[0]!);
+  const [method, setMethod] = useState<Method>("Crypto");
+  const [coin, setCoin] = useState<string>(cryptoNetworks[0]!.code);
+  const [country, setCountry] = useState(bankCountries[0]!);
   const [destination, setDestination] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -44,9 +46,15 @@ function Withdraw() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
+    const fullMethod =
+      method === "Crypto"
+        ? `Crypto (${coin})`
+        : method === "Bank transfer"
+          ? `Bank transfer (${country})`
+          : "PayPal";
     const { error } = await supabase.rpc("request_withdrawal", {
       _amount: amount,
-      _method: method,
+      _method: fullMethod,
       _destination: destination,
     });
     setBusy(false);
