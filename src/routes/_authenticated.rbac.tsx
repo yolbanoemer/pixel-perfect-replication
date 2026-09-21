@@ -31,6 +31,8 @@ export const Route = createFileRoute("/_authenticated/rbac")({
       { name: "description", content: "Staff tools for rates, members, payouts and announcements." },
       { property: "og:title", content: "Control room — Terravest" },
       { property: "og:description", content: "Staff tools for Terravest operations." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ControlRoom,
@@ -53,6 +55,7 @@ type Tab = (typeof tabs)[number];
 function ControlRoom() {
   const { isStaff, isAdmin } = useAuth();
   const [tab, setTab] = useState<Tab>("Overview");
+  const visibleTabs = isAdmin ? tabs : tabs.filter((item) => item !== "Member history");
 
   if (!isStaff) {
     return (
@@ -72,7 +75,7 @@ function ControlRoom() {
         subtitle={isAdmin ? "Full admin access." : "Support access — some tools are limited."}
       />
       <div className="mb-6 flex flex-wrap gap-2">
-        {tabs.map((t) => (
+        {visibleTabs.map((t) => (
           <Button
             key={t}
             onClick={() => setTab(t)}
@@ -93,7 +96,7 @@ function ControlRoom() {
       {tab === "Overview" && <Overview />}
       {tab === "Rates & terms" && <Rates isAdmin={isAdmin} />}
       {tab === "Members" && <Members isAdmin={isAdmin} />}
-      {tab === "Member history" && <MemberHistory isAdmin={isAdmin} />}
+      {tab === "Member history" && isAdmin && <MemberHistory />}
       {tab === "Positions" && <Positions />}
       {tab === "Deposits" && <Deposits />}
       {tab === "Payouts" && <Payouts />}
@@ -401,7 +404,7 @@ function Members({ isAdmin }: { isAdmin: boolean }) {
   );
 }
 
-function MemberHistory({ isAdmin }: { isAdmin: boolean }) {
+function MemberHistory() {
   const qc = useQueryClient();
   const { data: profiles = [] } = useQuery(allProfilesQuery);
   const { data: investments = [] } = useQuery(allInvestmentsQuery);
@@ -497,7 +500,7 @@ function MemberHistory({ isAdmin }: { isAdmin: boolean }) {
         )}
       </Panel>
 
-      {selectedProfile && isAdmin && (
+      {selectedProfile && (
         <Panel>
           <h3 className="text-sm font-semibold">Add completed investment history</h3>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -557,11 +560,9 @@ function MemberHistory({ isAdmin }: { isAdmin: boolean }) {
                       {shortDate(investment.started_at)} → {shortDate(investment.matures_at)} · {usd(investment.amount_usd)} · {pct(investment.daily_rate)}/day · {investment.payout_credited ? "paid out" : investment.status}
                     </p>
                   </div>
-                  {isAdmin && (
-                    <Button size="sm" variant="outline" onClick={() => beginEdit(investment)}>
-                      Adjust dates
-                    </Button>
-                  )}
+                  <Button size="sm" variant="outline" onClick={() => beginEdit(investment)}>
+                    Adjust dates
+                  </Button>
                 </div>
                 {editingId === investment.id && (
                   <div className="mt-3 grid gap-3 border-t border-border pt-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto_auto]">
