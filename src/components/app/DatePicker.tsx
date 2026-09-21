@@ -12,11 +12,11 @@ export function DatePicker({
   maxDate = new Date(),
   label = "Choose date",
 }: {
-  value?: Date;
+  value?: Date | undefined;
   onChange: (date: Date | undefined) => void;
-  minDate?: Date;
-  maxDate?: Date;
-  label?: string;
+  minDate?: Date | undefined;
+  maxDate?: Date | undefined;
+  label?: string | undefined;
 }) {
   return (
     <Popover>
