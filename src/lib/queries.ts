@@ -185,6 +185,19 @@ export const allInvestmentsQuery = queryOptions({
   },
 });
 
+export const allTransactionsQuery = queryOptions({
+  queryKey: ["admin", "transactions"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("wallet_transactions")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(1000);
+    if (error) throw error;
+    return data ?? [];
+  },
+});
+
 export const allWithdrawalsQuery = queryOptions({
   queryKey: ["admin", "withdrawals"],
   queryFn: async () => {
