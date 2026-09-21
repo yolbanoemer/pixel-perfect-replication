@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import {
   allInvestmentsQuery,
+  allTransactionsQuery,
   allProfilesQuery,
   allRolesQuery,
   allTicketsQuery,
@@ -21,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { DatePicker } from "@/components/app/DatePicker";
 
 export const Route = createFileRoute("/_authenticated/rbac")({
   head: () => ({
@@ -38,6 +40,7 @@ const tabs = [
   "Overview",
   "Rates & terms",
   "Members",
+  "Member history",
   "Positions",
   "Deposits",
   "Payouts",
@@ -70,9 +73,11 @@ function ControlRoom() {
       />
       <div className="mb-6 flex flex-wrap gap-2">
         {tabs.map((t) => (
-          <button
+          <Button
             key={t}
             onClick={() => setTab(t)}
+            variant="ghost"
+            size="sm"
             className={
               "rounded-full border px-3 py-1.5 text-xs transition-colors " +
               (t === tab
@@ -81,13 +86,14 @@ function ControlRoom() {
             }
           >
             {t}
-          </button>
+          </Button>
         ))}
       </div>
 
       {tab === "Overview" && <Overview />}
       {tab === "Rates & terms" && <Rates isAdmin={isAdmin} />}
       {tab === "Members" && <Members isAdmin={isAdmin} />}
+      {tab === "Member history" && <MemberHistory isAdmin={isAdmin} />}
       {tab === "Positions" && <Positions />}
       {tab === "Deposits" && <Deposits />}
       {tab === "Payouts" && <Payouts />}

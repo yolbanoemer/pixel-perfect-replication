@@ -11,6 +11,8 @@ import {
   Shield,
   LogOut,
   LineChart,
+  Menu,
+  Settings,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, signOutEverywhere } from "@/lib/auth";
@@ -18,6 +20,15 @@ import { profileQuery } from "@/lib/queries";
 import { usd } from "@/lib/format";
 import { Logo } from "@/components/site/Logo";
 import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -49,6 +60,12 @@ function AppShell() {
     await signOutEverywhere(queryClient);
     navigate({ to: "/auth", replace: true });
   }
+
+  const mobileNav = [
+    ...nav,
+    ...(isStaff ? [{ to: "/rbac" as const, label: "Control room", icon: Shield }] : []),
+    { to: "/settings" as const, label: "Settings", icon: Settings },
+  ];
 
   return (
     <div className="min-h-screen lg:flex">
@@ -104,9 +121,39 @@ function AppShell() {
               <p className="text-xs text-muted-foreground">Wallet</p>
               <p className="font-display text-sm font-semibold">{usd(profile?.wallet_balance)}</p>
             </div>
-            <Button asChild variant="hero" size="sm">
+            <Button asChild variant="hero" size="sm" className="hidden sm:inline-flex">
               <Link to="/invest">Invest</Link>
             </Button>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="lg:hidden" aria-label="Open navigation">
+                  <Menu className="size-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[86vw] max-w-sm bg-card">
+                <SheetHeader className="text-left">
+                  <SheetTitle>Navigate</SheetTitle>
+                  <SheetDescription>Open any Terravest page.</SheetDescription>
+                </SheetHeader>
+                <nav className="mt-6 grid gap-1">
+                  {mobileNav.map((item) => (
+                    <SheetClose asChild key={item.to}>
+                      <Link
+                        to={item.to}
+                        className="flex items-center gap-3 rounded-md px-3 py-3 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+                        activeProps={{ className: "bg-muted text-foreground" }}
+                      >
+                        <item.icon className="size-5" />
+                        {item.label}
+                      </Link>
+                    </SheetClose>
+                  ))}
+                  <Button variant="ghost" className="mt-4 justify-start" onClick={handleSignOut}>
+                    <LogOut className="size-5" /> Sign out
+                  </Button>
+                </nav>
+              </SheetContent>
+            </Sheet>
           </div>
         </header>
 
