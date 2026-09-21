@@ -401,6 +401,215 @@ function Members({ isAdmin }: { isAdmin: boolean }) {
   );
 }
 
+function MemberHistory({ isAdmin }: { isAdmin: boolean }) {
+  const qc = useQueryClient();
+  const { data: profiles = [] } = useQuery(allProfilesQuery);
+  const { data: investments = [] } = useQuery(allInvestmentsQuery);
+  const { data: transactions = [] } = useQuery(allTransactionsQuery);
+  const { data: plans = [] } = useQuery(plansQuery(true));
+  const [memberId, setMemberId] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editStart, setEditStart] = useState<Date>();
+  const [editUnlock, setEditUnlock] = useState<Date>();
+  const [award, setAward] = useState({ planId: "", amount: "500", asset: "USD" });
+  const [awardDate, setAwardDate] = useState<Date>();
+  const [busy, setBusy] = useState(false);
+
+  const selectedProfile = profiles.find((profile) => profile.id === memberId);
+  const memberInvestments = investments.filter((investment) => investment.user_id === memberId);
+  const memberTransactions = transactions.filter((transaction) => transaction.user_id === memberId);
+  const selectedPlan = plans.find((plan) => plan.id === award.planId);
+  const latestAwardDate = selectedPlan
+    ? new Date(Date.now() - selectedPlan.lock_days * 86_400_000)
+    : new Date();
+
+  function beginEdit(investment: (typeof investments)[number]) {
+    setEditingId(investment.id);
+    setEditStart(new Date(investment.started_at));
+    setEditUnlock(new Date(investment.matures_at));
+  }
+
+  async function saveDates() {
+    if (!editingId || !editStart || !editUnlock) return;
+    setBusy(true);
+    const { error } = await supabase.rpc("admin_update_investment_dates", {
+      _investment_id: editingId,
+      _started_at: editStart.toISOString(),
+      _matures_at: editUnlock.toISOString(),
+    });
+    setBusy(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Investment dates updated");
+    setEditingId(null);
+    qc.invalidateQueries();
+  }
+
+  async function awardHistory(e: React.FormEvent) {
+    e.preventDefault();
+    if (!memberId || !award.planId || !awardDate) {
+      toast.error("Choose a member, plan and start date");
+      return;
+    }
+    setBusy(true);
+    const { error } = await supabase.rpc("admin_award_historical_investment", {
+      _user_id: memberId,
+      _plan_id: award.planId,
+      _amount: Number(award.amount),
+      _asset: award.asset,
+      _started_at: awardDate.toISOString(),
+    });
+    setBusy(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Investment history added");
+    setAwardDate(undefined);
+    qc.invalidateQueries();
+  }
+
+  return (
+    <div className="space-y-4">
+      <Panel>
+        <Label htmlFor="history-member">Member</Label>
+        <select
+          id="history-member"
+          value={memberId}
+          onChange={(event) => setMemberId(event.target.value)}
+          className="mt-2 h-10 w-full max-w-md rounded-md border border-border bg-background px-3 text-sm"
+        >
+          <option value="">Choose a member</option>
+          {profiles.map((profile) => (
+            <option key={profile.id} value={profile.id}>
+              @{profile.username}{profile.full_name ? ` — ${profile.full_name}` : ""}
+            </option>
+          ))}
+        </select>
+        {selectedProfile && (
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            <StatCard label="Wallet" value={usd(selectedProfile.wallet_balance)} />
+            <StatCard label="Positions" value={String(memberInvestments.length)} />
+            <StatCard label="History entries" value={String(memberTransactions.length)} />
+          </div>
+        )}
+      </Panel>
+
+      {selectedProfile && isAdmin && (
+        <Panel>
+          <h3 className="text-sm font-semibold">Add completed investment history</h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Creates the normal lock, capital return and ROI records. The member’s current wallet stays unchanged.
+          </p>
+          <form onSubmit={awardHistory} className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-5">
+            <select
+              value={award.planId}
+              onChange={(event) => setAward({ ...award, planId: event.target.value })}
+              className="h-10 rounded-md border border-border bg-background px-3 text-sm"
+              required
+            >
+              <option value="">Choose plan</option>
+              {plans.map((plan) => (
+                <option key={plan.id} value={plan.id}>{plan.name} · {plan.lock_days} days</option>
+              ))}
+            </select>
+            <Input
+              type="number"
+              min="1"
+              step="0.01"
+              value={award.amount}
+              onChange={(event) => setAward({ ...award, amount: event.target.value })}
+              placeholder="Amount"
+              required
+            />
+            <Input
+              value={award.asset}
+              onChange={(event) => setAward({ ...award, asset: event.target.value.toUpperCase() })}
+              placeholder="Asset"
+              required
+            />
+            <DatePicker
+              value={awardDate}
+              onChange={setAwardDate}
+              maxDate={latestAwardDate}
+              label="Start date"
+            />
+            <Button type="submit" variant="hero" disabled={busy || !selectedPlan}>Add history</Button>
+          </form>
+        </Panel>
+      )}
+
+      {selectedProfile && (
+        <Panel>
+          <h3 className="mb-3 text-sm font-semibold">Portfolio history</h3>
+          <div className="space-y-3">
+            {memberInvestments.length === 0 && <p className="text-sm text-muted-foreground">No positions.</p>}
+            {memberInvestments.map((investment) => (
+              <div key={investment.id} className="rounded-md border border-border p-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-medium">
+                      {(investment.plans as { name?: string } | null)?.name ?? `${investment.lock_days} days`} · {investment.asset}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {shortDate(investment.started_at)} → {shortDate(investment.matures_at)} · {usd(investment.amount_usd)} · {pct(investment.daily_rate)}/day · {investment.payout_credited ? "paid out" : investment.status}
+                    </p>
+                  </div>
+                  {isAdmin && (
+                    <Button size="sm" variant="outline" onClick={() => beginEdit(investment)}>
+                      Adjust dates
+                    </Button>
+                  )}
+                </div>
+                {editingId === investment.id && (
+                  <div className="mt-3 grid gap-3 border-t border-border pt-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto_auto]">
+                    <DatePicker value={editStart} onChange={setEditStart} label="Start date" />
+                    <DatePicker value={editUnlock} onChange={setEditUnlock} label="Unlock date" />
+                    <Button onClick={saveDates} variant="hero" disabled={busy}>Save dates</Button>
+                    <Button onClick={() => setEditingId(null)} variant="ghost">Cancel</Button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </Panel>
+      )}
+
+      {selectedProfile && (
+        <Panel>
+          <h3 className="mb-3 text-sm font-semibold">Transaction history</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[620px] text-sm">
+              <thead>
+                <tr className="border-b border-border text-left text-xs text-muted-foreground uppercase">
+                  <th className="px-3 py-2 font-medium">Date</th>
+                  <th className="px-3 py-2 font-medium">Type</th>
+                  <th className="px-3 py-2 font-medium">Details</th>
+                  <th className="px-3 py-2 text-right font-medium">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {memberTransactions.map((transaction) => (
+                  <tr key={transaction.id} className="border-b border-border/60 last:border-0">
+                    <td className="px-3 py-2 text-muted-foreground">{shortDate(transaction.created_at)}</td>
+                    <td className="px-3 py-2 capitalize">{transaction.type.replace("_", " ")}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{transaction.note ?? "—"}</td>
+                    <td className={`px-3 py-2 text-right ${num(transaction.amount) >= 0 ? "text-success" : "text-foreground"}`}>
+                      {num(transaction.amount) >= 0 ? "+" : ""}{usd(transaction.amount)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Panel>
+      )}
+    </div>
+  );
+}
+
 function Positions() {
   const { data: investments = [] } = useQuery(allInvestmentsQuery);
   return (
